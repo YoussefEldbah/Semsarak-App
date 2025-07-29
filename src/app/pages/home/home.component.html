@@ -1,0 +1,222 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-title">Find Your Dream Home</h1>
+      <p class="hero-subtitle">
+        Discover the perfect property that matches your lifestyle and budget
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Search Section -->
+<section class="search-section">
+  <div class="container">
+    <form (ngSubmit)="searchProperties()" class="search-form">
+      <div class="form-group">
+        <label class="form-label">Location (City)</label>
+        <input type="text" class="form-control" placeholder="Enter city..." [(ngModel)]="location" name="location" (input)="searchProperties()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Region</label>
+        <input type="text" class="form-control" placeholder="Enter region..." [(ngModel)]="region" name="region" (input)="searchProperties()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Price Range</label>
+        <select class="form-control" [(ngModel)]="priceRange" name="priceRange" (change)="searchProperties()">
+          <option value="">Any Price</option>
+          <option>$100k - $200k</option>
+          <option>$200k - $500k</option>
+          <option>$500k - $1M</option>
+          <option>$1M+</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary w-100" type="submit">
+          <i class="fas fa-search me-2"></i>
+          Search Properties
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Featured Properties Section -->
+<section class="section" id="properties">
+  <div class="container">
+    <h2 class="section-title">
+      {{ user && (user.role === 'Owner' || (user.roles && user.roles.includes('Owner'))) ? 'My Properties' : 'Featured Properties' }}
+    </h2>
+    <p class="section-subtitle">
+      Explore our handpicked selection of premium properties
+    </p>
+    
+    <div class="row">
+      <div class="col-lg-4 col-md-6 mb-4" *ngFor="let property of paginatedProperties">
+        <div class="property-card pro-card-modern">
+          <div class="property-image pro-image-modern">
+            <span class="property-price pro-badge-modern">${{ property.price }}</span>
+            <img [src]="getImageUrl(property.imagePaths?.[0])" alt="Property Image" class="pro-img-modern" />
+          </div>
+          <div class="property-details pro-details-modern">
+            <h5 class="property-title pro-title-modern">{{ property.title }}</h5>
+            <div class="property-location pro-location-modern">
+              <i class="fas fa-map-marker-alt me-1"></i>
+              <span>{{ property.city }}, {{ property.region }}</span>
+            </div>
+           
+            <a class="btn pro-btn-modern w-100" [routerLink]="['/property-details', property.id]">
+              View Details
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="totalPages > 1" class="pagination-container mt-4">
+      <nav aria-label="Properties pagination">
+        <ul class="pagination justify-content-center">
+          <!-- Previous Button -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="previousPage()" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          
+          <!-- Page Numbers -->
+          <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === currentPage">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          
+          <!-- Next Button -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)" (click)="nextPage()" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Page Info -->
+      <div class="text-center mt-2">
+        <small class="text-muted">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage, properties.length) }} of {{ properties.length }} properties
+        </small>
+      </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div *ngIf="properties.length === 0" class="text-center mt-4">
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        No properties found matching your search criteria.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section class="section bg-light" id="about">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h2 class="section-title text-start">Why Choose Semsarak?</h2>
+        <p class="section-subtitle text-start">
+          We're committed to making your property search seamless and successful
+        </p>
+        
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="feature-content">
+              <h5>Trusted & Secure</h5>
+              <p>All properties are verified and secure for your peace of mind</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="feature-content">
+              <h5>24/7 Support</h5>
+              <p>Our team is available round the clock to assist you</p>
+            </div>
+          </div>
+          
+          <div class="feature-item">
+            <div class="feature-icon">
+              <i class="fas fa-handshake"></i>
+            </div>
+            <div class="feature-content">
+              <h5>Expert Guidance</h5>
+              <p>Get professional advice from our experienced real estate experts</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="about-image">
+          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+               alt="About Semsarak" class="img-fluid rounded">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section" id="contact">
+  <div class="container">
+    <h2 class="section-title">Get In Touch</h2>
+    <p class="section-subtitle">
+      Ready to find your dream home? Contact us today!
+    </p>
+    
+    <div class="row">
+      <div class="col-lg-8 mx-auto">
+        <div class="contact-form">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" class="form-control" placeholder="Enter your first name">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" class="form-control" placeholder="Enter your last name">
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" placeholder="Enter your email">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Phone</label>
+            <input type="tel" class="form-control" placeholder="Enter your phone number">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Message</label>
+            <textarea class="form-control" rows="4" placeholder="Tell us about your requirements"></textarea>
+          </div>
+          
+          <button class="btn btn-primary">
+            <i class="fas fa-paper-plane me-2"></i>
+            Send Message
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

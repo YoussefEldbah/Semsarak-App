@@ -1,0 +1,128 @@
+.admin-dashboard-container {
+  max-width: 1100px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 1.5rem;
+  box-shadow: 0 8px 32px rgba(30,41,59,0.13), 0 2px 8px rgba(30,41,59,0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+}
+.admin-header {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 2rem;
+  gap: 0.7rem;
+}
+.admin-header i {
+  color: #ff9800;
+}
+.admin-content {
+  margin-top: 1.5rem;
+}
+.admin-section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 1.2rem;
+}
+.admin-users-table-placeholder {
+  background: #f8fafc;
+  border-radius: 0.7rem;
+  padding: 2.5rem;
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(30,41,59,0.06);
+}
+.admin-users-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #f8fafc;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30,41,59,0.06);
+  margin-bottom: 1.5rem;
+}
+.admin-users-table th, .admin-users-table td {
+  padding: 0.85rem 1.1rem;
+  text-align: left;
+}
+.admin-users-table th {
+  background: #e0e7ef;
+  color: #1e3a8a;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border-bottom: 2px solid #d1d5db;
+}
+.admin-users-table tr {
+  transition: background 0.15s;
+}
+.admin-users-table tbody tr:hover {
+  background: #e3f2fd;
+}
+.admin-users-table td {
+  font-size: 1rem;
+  color: #333;
+  vertical-align: middle;
+}
+.admin-users-table .badge {
+  font-size: 0.95rem;
+  padding: 0.35em 0.7em;
+  border-radius: 0.7em;
+  margin-right: 0.2em;
+}
+.admin-user-link {
+  color: #1e3a8a;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.15s;
+}
+.admin-user-link:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+.admin-tabs {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: flex-start;
+  margin-bottom: 2.2rem;
+}
+.admin-tab-btn {
+  background: #f3f4f6;
+  color: #1e3a8a;
+  border: none;
+  outline: none;
+  padding: 0.7rem 2.2rem;
+  border-radius: 2rem;
+  font-size: 1.08rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(30,41,59,0.07);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: 0.2px;
+}
+.admin-tab-btn.active {
+  background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(30,41,59,0.13);
+}
+.admin-tab-btn:hover:not(.active) {
+  background: #e0e7ef;
+  color: #2563eb;
+}
+@media (max-width: 700px) {
+  .admin-users-table th, .admin-users-table td {
+    padding: 0.5rem 0.4rem;
+    font-size: 0.95rem;
+  }
+  .admin-dashboard-container {
+    padding: 1rem 0.2rem 1rem 0.2rem;
+  }
+} 
