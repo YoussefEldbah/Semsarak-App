@@ -4,11 +4,14 @@
 
 .register-page {
   display: flex;
-  min-height: 100vh;
+
   align-items: stretch;
   position: relative;
   overflow: hidden;
-  background: rgb(79, 132, 237);
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(59, 130, 246, 0.4) 100%),
+  url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80') center/cover;
+min-height: 100vh;
+ 
 }
 
 
@@ -20,8 +23,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: rgb(79, 132, 237);
-  backdrop-filter: blur(10px);
+ 
   position: relative;
   z-index: 2;
 }
