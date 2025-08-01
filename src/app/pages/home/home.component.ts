@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +24,7 @@ interface Property {
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
   properties: Property[] = [];
   allProperties: Property[] = [];
   user: any = null;
@@ -46,6 +46,11 @@ export class HomeComponent implements OnInit {
   async ngOnInit() {
     this.user = this.getUserFromLocalStorage();
     await this.fetchProperties();
+  }
+
+  ngAfterViewInit() {
+    this.initStatisticsCounter();
+    this.initSmoothScrolling();
   }
 
   getUserFromLocalStorage() {
@@ -98,42 +103,89 @@ export class HomeComponent implements OnInit {
     return `https://localhost:7152${path}`;
   }
 
-  searchProperties() {
-    this.properties = this.allProperties.filter(p => {
-      const matchesLocation = !this.location || (p.city && p.city.toLowerCase().includes(this.location.toLowerCase()));
-      const matchesRegion = !this.region || (p.region && p.region.toLowerCase().includes(this.region.toLowerCase()));
-      let matchesPrice = true;
-      if (this.priceRange) {
-        let price: number = 0;
-        if (typeof p.price === 'string') {
-          price = Number((p.price as string).replace(/[^\d.]/g, ''));
-        } else if (typeof p.price === 'number') {
-          price = p.price;
+  // Statistics Counter Animation
+  initStatisticsCounter() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const statNumber = entry.target as HTMLElement;
+          const target = parseInt(statNumber.getAttribute('data-count') || '0');
+          this.animateCounter(statNumber, target);
+          observer.unobserve(statNumber);
         }
-        if (isNaN(price)) matchesPrice = false;
-        else if (this.priceRange === '$100k - $200k') matchesPrice = price >= 100000 && price <= 200000;
-        else if (this.priceRange === '$200k - $500k') matchesPrice = price > 200000 && price <= 500000;
-        else if (this.priceRange === '$500k - $1M') matchesPrice = price > 500000 && price <= 1000000;
-        else if (this.priceRange === '$1M+') matchesPrice = price > 1000000;
+      });
+    }, { threshold: 0.5 });
+
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => observer.observe(stat));
+  }
+
+  animateCounter(element: HTMLElement, target: number) {
+    let current = 0;
+    const increment = target / 100;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        current = target;
+        clearInterval(timer);
       }
-      let matchesRooms = true;
-      if (this.roomsCount && !isNaN(this.roomsCount)) {
-        let propRooms = typeof p.roomsCount === 'string' ? Number(p.roomsCount) : p.roomsCount;
-        if (typeof propRooms !== 'number' || isNaN(propRooms)) propRooms = 0;
-        matchesRooms = propRooms >= Number(this.roomsCount);
-      }
-      return matchesLocation && matchesRegion && matchesPrice;
+      element.textContent = Math.floor(current).toString();
+    }, 20);
+  }
+
+  // Smooth Scrolling
+  initSmoothScrolling() {
+    const links = document.querySelectorAll('a[href^="#"]');
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetId = (e.target as HTMLAnchorElement).getAttribute('href');
+        if (targetId) {
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        }
+      });
     });
-    this.currentPage = 1; // Reset to first page when searching
+  }
+
+  searchProperties() {
+    let filtered = [...this.allProperties];
+
+    if (this.location) {
+      filtered = filtered.filter(property =>
+        property.city?.toLowerCase().includes(this.location.toLowerCase())
+      );
+    }
+
+    if (this.region) {
+      filtered = filtered.filter(property =>
+        property.region?.toLowerCase().includes(this.region.toLowerCase())
+      );
+    }
+
+    if (this.priceRange) {
+      const [min, max] = this.priceRange.replace(/[$,]/g, '').split(' - ');
+      const minPrice = parseInt(min);
+      const maxPrice = max === '+' ? Infinity : parseInt(max);
+      
+      filtered = filtered.filter(property => {
+        const price = property.price;
+        return price >= minPrice && (maxPrice === Infinity || price <= maxPrice);
+      });
+    }
+
+    this.properties = filtered;
+    this.currentPage = 1;
     this.updatePagination();
   }
 
-  // Pagination methods
   updatePagination() {
     this.totalPages = Math.ceil(this.properties.length / this.itemsPerPage);
-    this.currentPage = Math.min(this.currentPage, this.totalPages);
-    if (this.currentPage < 1) this.currentPage = 1;
-    
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
     this.paginatedProperties = this.properties.slice(startIndex, endIndex);
@@ -163,20 +215,18 @@ export class HomeComponent implements OnInit {
     const maxVisiblePages = 5;
     
     if (this.totalPages <= maxVisiblePages) {
-      // Show all pages if total is small
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Show pages around current page
-      let start = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
-      let end = Math.min(this.totalPages, start + maxVisiblePages - 1);
+      let startPage = Math.max(1, this.currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
       
-      if (end - start + 1 < maxVisiblePages) {
-        start = Math.max(1, end - maxVisiblePages + 1);
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
       
-      for (let i = start; i <= end; i++) {
+      for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
     }
@@ -185,12 +235,12 @@ export class HomeComponent implements OnInit {
   }
 
   viewPropertyDetails(propertyId: number) {
-    // TODO: Navigate to property details page
+    // This will be handled by the router link in the template
     console.log('Viewing property:', propertyId);
   }
 
   sendContactMessage() {
-    // TODO: Implement contact form submission
+    // Implement contact form submission
     console.log('Sending contact message...');
   }
 }
