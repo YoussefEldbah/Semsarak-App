@@ -133,36 +133,7 @@
   }
 }
 
-/* Statistics Section */
-.stats-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 4rem 0;
-  color: white;
-}
 
-.stat-item {
-  text-align: center;
-  padding: 2rem 1rem;
-}
-
-.stat-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  opacity: 0.8;
-}
-
-.stat-number {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: #fbbf24;
-}
-
-.stat-label {
-  font-size: 1.1rem;
-  opacity: 0.9;
-  font-weight: 500;
-}
 
 /* Enhanced Search Section */
 .search-section {
@@ -361,48 +332,7 @@
   font-size: 0.9rem;
 }
 
-/* Newsletter Section */
-.newsletter-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 4rem 0;
-  color: white;
-}
 
-.newsletter-content h2 {
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.newsletter-content p {
-  margin-bottom: 2rem;
-  opacity: 0.9;
-  font-size: 1.1rem;
-}
-
-.newsletter-form .input-group {
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.newsletter-form .form-control {
-  border: none;
-  border-radius: 8px 0 0 8px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-}
-
-.newsletter-form .btn {
-  border-radius: 0 8px 8px 0;
-  padding: 0.75rem 1.5rem;
-  background: #fbbf24;
-  border: none;
-  color: #1f2937;
-  font-weight: 600;
-}
-
-.newsletter-form .btn:hover {
-  background: #f59e0b;
-}
 
 /* CTA Section */
 .cta-section {
@@ -718,19 +648,9 @@
     align-items: center;
   }
   
-  .newsletter-form .input-group {
-    flex-direction: column;
-  }
+
   
-  .newsletter-form .form-control,
-  .newsletter-form .btn {
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-  }
-  
-  .stat-number {
-    font-size: 2.5rem;
-  }
+
   
   .service-icon {
     width: 60px;

@@ -49,7 +49,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.initStatisticsCounter();
     this.initSmoothScrolling();
   }
 
@@ -103,35 +102,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     return `https://localhost:7152${path}`;
   }
 
-  // Statistics Counter Animation
-  initStatisticsCounter() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const statNumber = entry.target as HTMLElement;
-          const target = parseInt(statNumber.getAttribute('data-count') || '0');
-          this.animateCounter(statNumber, target);
-          observer.unobserve(statNumber);
-        }
-      });
-    }, { threshold: 0.5 });
 
-    const statNumbers = document.querySelectorAll('.stat-number');
-    statNumbers.forEach(stat => observer.observe(stat));
-  }
-
-  animateCounter(element: HTMLElement, target: number) {
-    let current = 0;
-    const increment = target / 100;
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        current = target;
-        clearInterval(timer);
-      }
-      element.textContent = Math.floor(current).toString();
-    }, 20);
-  }
 
   // Smooth Scrolling
   initSmoothScrolling() {
