@@ -60,6 +60,19 @@ export class RegisterComponent {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
 
+  closeSuccessMessage(): void {
+    this.successMessage = '';
+  }
+
+  closeErrorMessage(): void {
+    this.errorMessage = '';
+  }
+
+  retryRegistration(): void {
+    this.errorMessage = '';
+    this.onSubmit();
+  }
+
   async onSubmit(): Promise<void> {
     if (this.registerForm.valid) {
       this.isLoading = true;
@@ -88,7 +101,7 @@ export class RegisterComponent {
           localStorage.setItem('user', JSON.stringify(data));
           setTimeout(() => {
             this.router.navigate(['/login']);
-          }, 2000);
+          }, 3000); // Increased delay to show the success message
         } else {
           console.log('❌ Registration failed!');
           console.log('Status:', response.status);
@@ -98,15 +111,10 @@ export class RegisterComponent {
       } catch (error) {
         console.log('❌ Registration failed!');
         console.log('Error:', error);
-        this.errorMessage = 'Registration failed. Please try again.';
+        this.errorMessage = 'Network error. Please check your connection and try again.';
       } finally {
         this.isLoading = false;
       }
-    } else {
-      Object.keys(this.registerForm.controls).forEach(key => {
-        const control = this.registerForm.get(key);
-        control?.markAsTouched();
-      });
     }
   }
 }

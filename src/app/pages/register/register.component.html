@@ -12,15 +12,55 @@
       </div>
       
       <div class="register-body">
-        <div *ngIf="errorMessage" class="custom-alert custom-alert-danger animate__animated animate__fadeInDown">
-          <span class="custom-alert-icon"><i class="fas fa-exclamation-circle"></i></span>
-          <span class="custom-alert-text">{{ errorMessage }}</span>
-          <span class="custom-alert-close" (click)="errorMessage = ''">&times;</span>
+        <!-- Enhanced Success Message -->
+        <div *ngIf="successMessage" class="notification-container">
+          <div class="success-notification animate__animated animate__fadeInDown">
+            <div class="notification-icon success-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="notification-content">
+              <h4 class="notification-title">🎉 Account Created Successfully!</h4>
+              <p class="notification-message">{{ successMessage }}</p>
+              <div class="notification-progress">
+                <div class="progress-bar"></div>
+              </div>
+            </div>
+            <button class="notification-close" (click)="closeSuccessMessage()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
-        <div *ngIf="successMessage" class="custom-alert custom-alert-success animate__animated animate__fadeInDown">
-          <span class="custom-alert-icon"><i class="fas fa-check-circle"></i></span>
-          <span class="custom-alert-text">{{ successMessage }}</span>
-          <span class="custom-alert-close" (click)="successMessage = ''">&times;</span>
+
+        <!-- Enhanced Error Message -->
+        <div *ngIf="errorMessage" class="notification-container">
+          <div class="error-notification animate__animated animate__fadeInDown">
+            <div class="notification-icon error-icon">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="notification-content">
+              <h4 class="notification-title">⚠️ Registration Failed</h4>
+              <p class="notification-message">{{ errorMessage }}</p>
+              <div class="notification-actions">
+                <button class="btn-retry" (click)="retryRegistration()">
+                  <i class="fas fa-redo"></i> Try Again
+                </button>
+              </div>
+            </div>
+            <button class="notification-close" (click)="closeErrorMessage()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div *ngIf="isLoading" class="loading-overlay">
+          <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-text">
+              <h3>Creating Your Account...</h3>
+              <p>Please wait while we set up your profile</p>
+            </div>
+          </div>
         </div>
         
         <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
@@ -57,13 +97,18 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">Create a password</label>
-              <input 
-                [type]="showPassword ? 'text' : 'password'" 
-                class="form-control" 
-                placeholder="6 characters or more"
-                formControlName="password"
-                [class.is-invalid]="isFieldInvalid('password')"
-              >
+              <div class="password-input-group">
+                <input 
+                  [type]="showPassword ? 'text' : 'password'" 
+                  class="form-control" 
+                  placeholder="6 characters or more"
+                  formControlName="password"
+                  [class.is-invalid]="isFieldInvalid('password')"
+                >
+                <button type="button" class="password-toggle" (click)="togglePassword()">
+                  <i [class]="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
               <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
                 Password must be at least 8 characters long
               </div>
