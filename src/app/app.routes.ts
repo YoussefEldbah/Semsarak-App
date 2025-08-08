@@ -90,6 +90,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/property-details/property-details.component').then(m => m.PropertyDetailsComponent)
   },
   { path: 'payment-callback', loadComponent: () => import('./pages/payment-callback/payment-callback.component').then(m => m.PaymentCallbackComponent) },
+  { path: 'payment-success', loadComponent: () => import('./pages/payment-success/payment-success.component').then(m => m.PaymentSuccessComponent) },
   { path: '**', redirectTo: '' }
 ];
 

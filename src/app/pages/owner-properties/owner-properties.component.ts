@@ -35,15 +35,8 @@ export class OwnerPropertiesComponent implements OnInit {
   toastType: 'success' | 'error' = 'success';
 
   advertiseModalProperty: any = null;
-  advertiseFee: number = 100; // مثال: 100 جنيه أو حسب المطلوب
-  advertiseIframeUrl: SafeResourceUrl | null = null;
+  advertiseFee: number = 100; // رسوم الإعلان بالجنيه المصري
   advertiseLoading: boolean = false;
-  showAdvertiseConfirmModal: boolean = false;
-  advertiseTransactionId: string = '';
-  advertiseConfirmLoading: boolean = false;
-  advertiseConfirmSuccess: boolean = false;
-  advertiseConfirmError: string = '';
-  currentPaymentId: number | null = null;
 
   constructor(private fb: FormBuilder, private router: Router, private sanitizer: DomSanitizer) {
     this.editPropertyForm = this.fb.group({}); // فورم فارغ كبداية
@@ -122,8 +115,7 @@ export class OwnerPropertiesComponent implements OnInit {
       description: [property.description],
       roomsCount: [property.roomsCount],
       genderPreference: [property.genderPreference],
-      street: [property.street],
-      status: [property.status]
+      street: [property.street]
     });
   }
 
@@ -165,16 +157,28 @@ export class OwnerPropertiesComponent implements OnInit {
         method: 'DELETE',
         headers: token ? { 'Authorization': 'Bearer ' + token } : {}
       });
+      
       if (response.ok) {
         await this.fetchMyProperties();
         this.successMessage = 'Property deleted successfully!';
         setTimeout(() => this.successMessage = '', 3000);
       } else {
-        this.errorMessage = 'Failed to delete property.';
-        setTimeout(() => this.errorMessage = '', 3000);
+        // Handle specific error cases
+        const errorText = await response.text();
+        console.error('Delete error:', errorText);
+        
+        if (response.status === 400) {
+          this.errorMessage = 'Cannot delete property: It has active bookings or payments.';
+        } else if (response.status === 404) {
+          this.errorMessage = 'Property not found.';
+        } else {
+          this.errorMessage = 'Failed to delete property. Please try again.';
+        }
+        setTimeout(() => this.errorMessage = '', 5000);
       }
     } catch (err) {
-      this.errorMessage = 'Failed to delete property.';
+      console.error('Delete error:', err);
+      this.errorMessage = 'Network error occurred while deleting property.';
       setTimeout(() => this.errorMessage = '', 3000);
     }
   }
@@ -353,13 +357,11 @@ export class OwnerPropertiesComponent implements OnInit {
 
   openAdvertiseModal(property: any) {
     this.advertiseModalProperty = property;
-    this.advertiseIframeUrl = null;
     this.advertiseLoading = false;
   }
 
   closeAdvertiseModal() {
     this.advertiseModalProperty = null;
-    this.advertiseIframeUrl = null;
     this.advertiseLoading = false;
   }
 
@@ -378,12 +380,23 @@ export class OwnerPropertiesComponent implements OnInit {
         body: JSON.stringify({ propertyId: this.advertiseModalProperty.id })
       });
       const data = await res.json();
-      this.currentPaymentId = data.PaymentId;
+      
+      // إنشاء URL للـ callback مع الـ payment ID
+      const callbackUrl = `http://localhost:4200/payment-callback`;
+      
+      // تحديث iframe URL مع callback URL
+      const iframeUrlWithCallback = `${data.iframeUrl}&success_url=${encodeURIComponent(callbackUrl)}&failure_url=${encodeURIComponent(callbackUrl)}`;
+      
       // افتح نافذة جديدة للدفع
-      window.open(data.iframeUrl, '_blank', 'width=600,height=800');
+      window.open(iframeUrlWithCallback, '_blank', 'width=600,height=800');
       this.closeAdvertiseModal();
+      
+      // إظهار رسالة للمستخدم
+      this.toastMessage = 'تم فتح صفحة الدفع. بعد إتمام الدفع ستحتاج لتأكيد العملية يدوياً.';
+      this.toastType = 'success';
+      setTimeout(() => this.toastMessage = '', 5000);
     } catch (err) {
-      this.toastMessage = 'Failed to initiate payment!';
+      this.toastMessage = 'فشل في بدء عملية الدفع!';
       this.toastType = 'error';
       setTimeout(() => this.toastMessage = '', 3000);
     } finally {
@@ -391,57 +404,5 @@ export class OwnerPropertiesComponent implements OnInit {
     }
   }
 
-  openAdvertiseConfirmModal() {
-    this.showAdvertiseConfirmModal = true;
-    this.advertiseTransactionId = '';
-    this.advertiseConfirmLoading = false;
-    this.advertiseConfirmSuccess = false;
-    this.advertiseConfirmError = '';
-  }
 
-  closeAdvertiseConfirmModal() {
-    this.showAdvertiseConfirmModal = false;
-    this.advertiseTransactionId = '';
-    this.advertiseConfirmLoading = false;
-    this.advertiseConfirmSuccess = false;
-    this.advertiseConfirmError = '';
-  }
-
-  // عند تأكيد الدفع
-  async confirmAdvertisePayment(transactionId: string) {
-    if (!this.currentPaymentId) return;
-    this.advertiseConfirmLoading = true;
-    this.advertiseConfirmSuccess = false;
-    this.advertiseConfirmError = '';
-    try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const res = await fetch('https://localhost:7152/api/payment/paymob-confirm', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': 'Bearer ' + token } : {})
-        },
-        body: JSON.stringify({ paymentId: this.currentPaymentId, transactionId })
-      });
-      if (res.ok) {
-        this.advertiseConfirmSuccess = true;
-        // تحديث حالة العقار في القائمة
-        const idx = this.myProperties.findIndex(p => p.id === this.advertiseModalProperty.id);
-        if (idx !== -1) {
-          this.myProperties[idx].status = 'Available';
-        }
-        setTimeout(() => {
-          this.closeAdvertiseConfirmModal();
-          this.closeAdvertiseModal();
-        }, 2000);
-      } else {
-        const errorText = await res.text();
-        this.advertiseConfirmError = errorText || 'Failed to confirm payment.';
-      }
-    } catch (err) {
-      this.advertiseConfirmError = 'Failed to confirm payment. Please try again.';
-    } finally {
-      this.advertiseConfirmLoading = false;
-    }
-  }
 }
